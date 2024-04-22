@@ -5,7 +5,7 @@ import numpy as np
 plt.figure(figsize=(11, 4.5))
 
 data_path_prefix = "../test_results/"
-data_file_name = "hilbert.csv"
+data_file_name = "sqrt_sum.csv"
 cols = ["algorithm", "rank", "error"]
 
 df = pd.read_csv(data_path_prefix + data_file_name, usecols=cols).dropna()
@@ -40,13 +40,13 @@ for i, df in enumerate([tt_rsvd_df, STTA_gauss_df, STTA_srht_df, STTA_srht_hash_
     )
 
 save_path_prefix = "../plots/"
-save_file_name = "plot-hilbert.pdf"
+save_file_name = "plot-sqrt-sum.pdf"
 
 plt.xticks(plot_ranks)
 plt.ylabel("Relative error")
 plt.xlabel("TT-rank")
 plt.yscale("log")
 plt.legend()
-plt.title("Approximation of Hilbert tensor")
+plt.title("Approximation of sqaure-root-sum tensor")
 plt.savefig(save_path_prefix + save_file_name, transparent=True, bbox_inches="tight")
 plt.show()

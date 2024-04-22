@@ -45,12 +45,12 @@ function run_test(parameters)
     return err, time_taken, seed
 end
 
-n = 5
-d = 7
-global T = hilbert_tensor(n, d)
+n = 10
+d = 5
+global T = square_root_sum_tensor(n, d, -0.2, 2)
 global norm_T = norm(T)
 
-file_path = "../test_results/hilbert.csv"
+file_path = "../test_results/sqrt_sum.csv"
 num_test = 100
 start_row = 1
 
@@ -64,4 +64,4 @@ catch e
     println("File finished")
 end
 
-run_python_script("../plots_code/plot_hilbert.py")
+run_python_script("../plots_code/plot_sqrt_sum.py")

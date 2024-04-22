@@ -49,3 +49,7 @@ function ensure_vector(x)
     end
     return [x]
 end
+
+function run_python_script(script_path)
+    run(`python $(script_path)`)
+end

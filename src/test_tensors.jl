@@ -29,3 +29,7 @@ function square_root_sum_tensor_v2(n, d, a, b)
     
     return S
 end
+
+function random_tensor(n, d)
+    return randn(fill(n,d)...)
+end

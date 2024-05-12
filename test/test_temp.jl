@@ -1,18 +1,14 @@
-function generate_tt(n,d)
-    dims=ntuple(_ -> n, d)
-    v=randn(ntuple(_ -> n, d)...)
-    tol=1e-12
-    mps= tt_STTA(v, fix_ranks(fill(10000, d-1), dims), fix_ranks(fill(10000, d-1), dims)*2) #tt_rsvd(v,100000)
-    return v, mps
-end
+n = 5
+d = 7
+T = random_tensor(n, d)
+#hilbert_tensor(n, d)
+norm_T = norm(T)
 
-v, mps = generate_tt(5,7)
-# tt_rounding_olese!(mps; tt_ranks = tt_ranks(mps), tol=1e-12, truncation=false)
-# tt_rounding_rand_ort!(mps; tt_ranks = tt_ranks(mps), tol=1e-12, truncation=false)
-# tt_rounding_kres_left!(mps; tt_l_ranks = ceil.(Int, tt_ranks(mps) .* 1.1), tt_r_ranks = tt_ranks(mps))
-#println(tt_ranks(mps))
-#tt_rounding_fwht_left!(mps; tt_l_ranks = ceil.(Int, tt_ranks(mps) .* 2), tt_r_ranks = tt_ranks(mps))
-println(tt_ranks(mps))
+dims = size(T)
+ranks = fix_ranks(fill(10000,d-1), dims)
+TTT = tt_svd(T,ranks)
 
-v_ = tt2full(mps)
-println(norm(v-v_)/norm(v))
+approx = tt_rand_orth_rounding_v2(TTT, ranks)
+# approx = tt_STTA_rounding(TTT, ranks, ranks.*2; sketch_type = "srht_hash", s = 1, seed = nothing)
+T_ = tt2full(approx)
+println(norm(T-T_)/norm_T)

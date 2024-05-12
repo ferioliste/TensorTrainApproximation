@@ -6,14 +6,19 @@ using FFTW
 using CSV
 using DataFrames
 using Dates
+using TensorOperations
+using Plots
 
 include("../src/utils.jl")
 include("../src/sketching.jl")
 include("../src/tensor_operations.jl")
 include("../src/test_tensors.jl")
 include("../src/tt_factorization.jl")
+include("../src/tt_rounding.jl")
 
 
-#include("../test/test_temp.jl")
+include("../test/test_temp.jl")
 #include("../test/test_hilbert.jl")
-include("../test/test_sqrt_sum.jl")
+#include("../test/test_sqrt_sum.jl")
+
+#include("../test/test_pseudonorm.jl")

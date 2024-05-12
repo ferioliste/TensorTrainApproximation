@@ -58,3 +58,35 @@ function set_test_results(file_path::String, row::Int, new_values::Dict)
     
     write(file_path, join(lines, "\n"))
 end
+
+function tt_rand_orth_rounding(oldTT, tt_ranks; seed = nothing)
+    dims = get_tt_dims(oldTT)
+    n_dims = length(dims)
+    old_tt_ranks = [1; get_tt_ranks(oldTT); 1]
+    
+    TT = Array{AbstractArray{Float64},1}(undef, n_dims)
+    tt_ranks = [1; fix_ranks(tt_ranks, dims); 1]
+
+    rng = isnothing(seed) ? Random.default_rng() : MersenneTwister(seed)
+    Y = Array{AbstractArray{Float64},1}(undef, n_dims)
+    for μ in 1:n_dims
+        Y[μ] = randn(rng, tt_ranks[μ], dims[μ], tt_ranks[μ+1])
+    end
+
+    W = Array{Array{Float64, 2},1}(undef, n_dims - 1)
+    W[n_dims - 1] = mode_kj_mult(oldTT[n_dims], Y[n_dims], (2,3), (2,3))
+    for μ = n_dims-1:-1:2
+        W[μ - 1] = mode_kj_mult(mode_kj_mult(oldTT[μ], W[μ], 3, 1), Y[μ], (2,3), (2,3))
+    end
+
+    TT[1] = deepcopy(oldTT[1])
+    for μ = 1:n_dims-1
+        Z = reshape(TT[μ], (tt_ranks[μ]*dims[μ], old_tt_ranks[μ+1]))
+        F = qr(Z*W[μ])
+        TT[μ] = reshape(Matrix(F.Q), (tt_ranks[μ], dims[μ], tt_ranks[μ+1]))
+        TT[μ+1] = Matrix(F.Q)' * Z * reshape(oldTT[μ+1], (old_tt_ranks[μ+1], dims[μ+1]*old_tt_ranks[μ+2]))
+    end
+    TT[n_dims] = reshape(TT[n_dims], (tt_ranks[n_dims], dims[n_dims], 1))
+
+    return TT
+end

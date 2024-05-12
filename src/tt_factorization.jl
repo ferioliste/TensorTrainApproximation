@@ -7,7 +7,7 @@ function tt_svd(tensor, tt_ranks)
 
     C = deepcopy(tensor)
     for i in 1:n_dims-1
-        C = reshape(C, (tt_ranks[i]*dims[i], length(C)÷(tt_ranks[i]*dims[i])))
+        C = reshape(C, (tt_ranks[i]*dims[i], :))
         U, S, V = LinearAlgebra.svd(C)
         TTTensor[i] = reshape(U[:, 1:tt_ranks[i+1]], (tt_ranks[i], dims[i], tt_ranks[i+1]))
         C = S[1:tt_ranks[i+1]] .* V[:, 1:tt_ranks[i+1]]'
@@ -26,7 +26,7 @@ function tt_rsvd(tensor, tt_ranks; sketch_type = "gaussian", s = 1, seed = nothi
 
     C = deepcopy(tensor)
     for i in 1:n_dims-1
-        C = reshape(C, (tt_ranks[i]*dims[i], length(C)÷(tt_ranks[i]*dims[i])))
+        C = reshape(C, (tt_ranks[i]*dims[i], :))
         F = qr(sketch(C', tt_ranks[i+1], sketch_type, s=s, seed=seed)')
         TTTensor[i] = reshape(Matrix(F.Q), (tt_ranks[i], dims[i], tt_ranks[i+1]))
         C = Matrix(F.Q)' * C

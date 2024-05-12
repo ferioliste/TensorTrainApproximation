@@ -67,7 +67,7 @@ function tt2full(mps)
     return reshape(res, size(res)[2:end-1]...)
 end
 
-function tt_ranks(mps)
+function get_tt_ranks(mps)
     tt_rankss=fill(1,length(mps)-1)
     for i in 1:length(mps)-1
         tt_rankss[i] = size(mps[i],3)
@@ -75,7 +75,7 @@ function tt_ranks(mps)
     return tt_rankss
 end
 
-function tt_dims(mps)
+function get_tt_dims(mps)
     tt_dims=fill(1,length(mps))
     for i in 1:length(mps)
         tt_dims[i] = size(mps[i],2)

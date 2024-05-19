@@ -100,3 +100,27 @@ function fix_ranks(tt_ranks, dims)
 
     return tt_ranks
 end
+
+function tt_sum(TT1, TT2)
+    dims = get_tt_dims(TT1)
+    n_dims = length(dims)
+    tt_ranks1 = get_tt_ranks(TT1)
+    tt_ranks2 = get_tt_ranks(TT2)
+    tt_ranks = tt_ranks1 + tt_ranks2
+    
+    TT = Array{AbstractArray{Float64},1}(undef, n_dims)
+
+    TT[1] = zeros(1, dims[1], tt_ranks[1])
+    TT[1][:,:,1:tt_ranks1[1]] = TT1[1]
+    TT[1][:,:,tt_ranks2[1]+1:tt_ranks[1]] = TT2[1]
+    for μ in 2:n_dims-1
+        TT[μ] = zeros(tt_ranks[μ-1], dims[μ], tt_ranks[μ])
+        TT[μ][1:tt_ranks1[μ-1],:,1:tt_ranks1[μ]] = TT1[μ]
+        TT[μ][tt_ranks2[μ-1]+1:tt_ranks[μ-1],:,tt_ranks2[μ]+1:tt_ranks[μ]] = TT2[μ]
+    end
+    TT[n_dims] = zeros(tt_ranks[n_dims-1], dims[1], 1)
+    TT[n_dims][1:tt_ranks1[n_dims-1],:,:] = TT1[n_dims]
+    TT[n_dims][tt_ranks2[n_dims-1]+1:tt_ranks[n_dims-1],:,:] = TT2[n_dims]
+
+    return TT
+end

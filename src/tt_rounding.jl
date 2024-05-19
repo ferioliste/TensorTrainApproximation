@@ -1,4 +1,4 @@
-function tt_svd_rounding(oldTT, tt_ranks)
+function tt_svd_rounding(oldTT, tt_ranks; to::TimerOutput=TimerOutput())
     dims = get_tt_dims(oldTT)
     n_dims = length(dims)
     old_tt_ranks = [1; get_tt_ranks(oldTT); 1]
@@ -6,24 +6,28 @@ function tt_svd_rounding(oldTT, tt_ranks)
     TT = Array{AbstractArray{Float64},1}(undef, n_dims)
     tt_ranks = [1; fix_ranks(tt_ranks, dims); 1]
 
-    TT[n_dims] = deepcopy(oldTT[n_dims])
-    for μ = n_dims:-1:2
-        F = qr(reshape(TT[μ], (old_tt_ranks[μ], dims[μ]*old_tt_ranks[μ+1]))')
-        TT[μ] = Matrix(F.Q)'
-        TT[μ-1] = reshape(oldTT[μ-1], (old_tt_ranks[μ-1]*dims[μ-1], old_tt_ranks[μ])) * Matrix(F.R)'
+    @timeit to "t1" begin
+        TT[n_dims] = deepcopy(oldTT[n_dims])
+        for μ = n_dims:-1:2
+            F = qr(reshape(TT[μ], (old_tt_ranks[μ], dims[μ]*old_tt_ranks[μ+1]))')
+            TT[μ] = Matrix(F.Q)'
+            TT[μ-1] = reshape(oldTT[μ-1], (old_tt_ranks[μ-1]*dims[μ-1], old_tt_ranks[μ])) * Matrix(F.R)'
+        end
     end
 
-    for μ = 1:1:n_dims-1
-        U, S, V = LinearAlgebra.svd(reshape(TT[μ], (tt_ranks[μ]*dims[μ], old_tt_ranks[μ+1])))
-        TT[μ] = reshape(U[:, 1:tt_ranks[μ+1]], (tt_ranks[μ], dims[μ], tt_ranks[μ+1]))
-        TT[μ+1] = (S[1:tt_ranks[μ+1]] .* V[:, 1:tt_ranks[μ+1]]') * reshape(TT[μ+1], (old_tt_ranks[μ+1], dims[μ+1]*old_tt_ranks[μ+2]))
+    @timeit to "t2" begin
+        for μ = 1:1:n_dims-1
+            U, S, V = LinearAlgebra.svd(reshape(TT[μ], (tt_ranks[μ]*dims[μ], old_tt_ranks[μ+1])))
+            TT[μ] = reshape(U[:, 1:tt_ranks[μ+1]], (tt_ranks[μ], dims[μ], tt_ranks[μ+1]))
+            TT[μ+1] = (S[1:tt_ranks[μ+1]] .* V[:, 1:tt_ranks[μ+1]]') * reshape(TT[μ+1], (old_tt_ranks[μ+1], dims[μ+1]*old_tt_ranks[μ+2]))
+        end
+        TT[n_dims] = reshape(TT[n_dims], (tt_ranks[n_dims], dims[n_dims], 1))
     end
-    TT[n_dims] = reshape(TT[n_dims], (tt_ranks[n_dims], dims[n_dims], 1))
 
     return TT
 end
 
-function tt_rsvd_rounding(oldTT, tt_ranks; sketch_type = "gaussian", s = 1, seed = nothing)
+function tt_rsvd_rounding(oldTT, tt_ranks; sketch_type = "gaussian", s = 1, seed = nothing, to::TimerOutput=TimerOutput())
     dims = get_tt_dims(oldTT)
     n_dims = length(dims)
     old_tt_ranks = [1; get_tt_ranks(oldTT); 1]
@@ -31,26 +35,30 @@ function tt_rsvd_rounding(oldTT, tt_ranks; sketch_type = "gaussian", s = 1, seed
     TT = Array{AbstractArray{Float64},1}(undef, n_dims)
     tt_ranks = [1; fix_ranks(tt_ranks, dims); 1]
 
-    TT[n_dims] = deepcopy(oldTT[n_dims])
-    for μ = n_dims:-1:2
-        F = qr(reshape(TT[μ], (old_tt_ranks[μ], dims[μ]*old_tt_ranks[μ+1]))')
-        TT[μ] = Matrix(F.Q)'
-        TT[μ-1] = reshape(oldTT[μ-1], (old_tt_ranks[μ-1]*dims[μ-1], old_tt_ranks[μ])) * Matrix(F.R)'
+    @timeit to "t1" begin
+        TT[n_dims] = deepcopy(oldTT[n_dims])
+        for μ = n_dims:-1:2
+            F = qr(reshape(TT[μ], (old_tt_ranks[μ], dims[μ]*old_tt_ranks[μ+1]))')
+            TT[μ] = Matrix(F.Q)'
+            TT[μ-1] = reshape(oldTT[μ-1], (old_tt_ranks[μ-1]*dims[μ-1], old_tt_ranks[μ])) * Matrix(F.R)'
+        end
     end
 
-    for μ = 1:1:n_dims-1
-        temp = reshape(TT[μ], (tt_ranks[μ]*dims[μ], old_tt_ranks[μ+1]))
-        
-        F = qr(sketch(temp', tt_ranks[μ+1], sketch_type, s=s, seed=seed)')
-        TT[μ] = reshape(Matrix(F.Q), (tt_ranks[μ], dims[μ], tt_ranks[μ+1]))
-        TT[μ+1] = (Matrix(F.Q)' * temp) * reshape(TT[μ+1], (old_tt_ranks[μ+1], dims[μ+1]*old_tt_ranks[μ+2]))
+    @timeit to "t2" begin
+        for μ = 1:1:n_dims-1
+            temp = reshape(TT[μ], (tt_ranks[μ]*dims[μ], old_tt_ranks[μ+1]))
+            
+            F = qr(sketch(temp', tt_ranks[μ+1], sketch_type, s=s, seed=seed)')
+            TT[μ] = reshape(Matrix(F.Q), (tt_ranks[μ], dims[μ], tt_ranks[μ+1]))
+            TT[μ+1] = (Matrix(F.Q)' * temp) * reshape(TT[μ+1], (old_tt_ranks[μ+1], dims[μ+1]*old_tt_ranks[μ+2]))
+        end
+        TT[n_dims] = reshape(TT[n_dims], (tt_ranks[n_dims], dims[n_dims], 1))
     end
-    TT[n_dims] = reshape(TT[n_dims], (tt_ranks[n_dims], dims[n_dims], 1))
     
     return TT
 end
 
-function tt_rand_orth_rounding(oldTT, tt_ranks;  sketch_type = "gaussian", s = 1, seed = nothing)
+function tt_rand_orth_rounding(oldTT, tt_ranks;  sketch_type = "gaussian", s = 1, seed = nothing, to::TimerOutput=TimerOutput())
     dims = get_tt_dims(oldTT)
     n_dims = length(dims)
     old_tt_ranks = [1; get_tt_ranks(oldTT); 1]
@@ -58,20 +66,24 @@ function tt_rand_orth_rounding(oldTT, tt_ranks;  sketch_type = "gaussian", s = 1
     TT = Array{AbstractArray{Float64},1}(undef, n_dims)
     tt_ranks = [1; fix_ranks(tt_ranks, dims); 1]
 
-    W = Array{Array{Float64, 2},1}(undef, n_dims - 1)
-    W[n_dims - 1] = sketch(reshape(oldTT[n_dims], (old_tt_ranks[n_dims], dims[n_dims]*old_tt_ranks[n_dims+1]))', tt_ranks[n_dims], sketch_type, s=s, seed=seed)'
-    for μ = n_dims-1:-1:2
-        W[μ - 1] = sketch(reshape(reshape(oldTT[μ], (old_tt_ranks[μ]*dims[μ], old_tt_ranks[μ+1]))*W[μ], (old_tt_ranks[μ], dims[μ]*tt_ranks[μ+1]))', tt_ranks[μ], sketch_type, s=s, seed=seed)'
+    @timeit to "t1" begin
+        W = Array{Array{Float64, 2},1}(undef, n_dims - 1)
+        W[n_dims - 1] = sketch(reshape(oldTT[n_dims], (old_tt_ranks[n_dims], dims[n_dims]*old_tt_ranks[n_dims+1]))', tt_ranks[n_dims], sketch_type, s=s, seed=seed)'
+        for μ = n_dims-1:-1:2
+            W[μ - 1] = sketch(reshape(reshape(oldTT[μ], (old_tt_ranks[μ]*dims[μ], old_tt_ranks[μ+1]))*W[μ], (old_tt_ranks[μ], dims[μ]*tt_ranks[μ+1]))', tt_ranks[μ], sketch_type, s=s, seed=seed)'
+        end
     end
 
-    TT[1] = deepcopy(oldTT[1])
-    for μ = 1:n_dims-1
-        Z = reshape(TT[μ], (tt_ranks[μ]*dims[μ], old_tt_ranks[μ+1]))
-        F = qr(Z*W[μ])
-        TT[μ] = reshape(Matrix(F.Q), (tt_ranks[μ], dims[μ], tt_ranks[μ+1]))
-        TT[μ+1] = Matrix(F.Q)' * Z * reshape(oldTT[μ+1], (old_tt_ranks[μ+1], dims[μ+1]*old_tt_ranks[μ+2]))
+    @timeit to "t2" begin
+        TT[1] = deepcopy(oldTT[1])
+        for μ = 1:n_dims-1
+            Z = reshape(TT[μ], (tt_ranks[μ]*dims[μ], old_tt_ranks[μ+1]))
+            F = qr(Z*W[μ])
+            TT[μ] = reshape(Matrix(F.Q), (tt_ranks[μ], dims[μ], tt_ranks[μ+1]))
+            TT[μ+1] = Matrix(F.Q)' * Z * reshape(oldTT[μ+1], (old_tt_ranks[μ+1], dims[μ+1]*old_tt_ranks[μ+2]))
+        end
+        TT[n_dims] = reshape(TT[n_dims], (tt_ranks[n_dims], dims[n_dims], 1))
     end
-    TT[n_dims] = reshape(TT[n_dims], (tt_ranks[n_dims], dims[n_dims], 1))
 
     return TT
 end

@@ -24,4 +24,7 @@ include("../src/tt_rounding.jl")
 
 #include("../test/test_pseudonorm.jl")
 
-include("../test/test_A_hilbert_sqrt_sum.jl")
+#include("../test/test_A_hilbert_sqrt_sum.jl")
+#include("../test/test_B_tt_hilbert.jl")
+
+include("../test/test_B_tt_random_sum.jl")

@@ -15,7 +15,7 @@ df = pd.read_csv(data_path_prefix + data_file_name, usecols=cols).dropna()
 file_names = ["A_hilbert_tt_svd_ratio_n", "A_hilbert_tt_rsvd_ratio_n"]
 labels = [["svd", "matrix multiplication", None, "other"], ["sketching", "QR factorization", "matrix multiplication", "other"]]
 
-colors = ["#fad132", "#ff5500", "#ff3cc8", "#dc0000"]
+colors = ["#fad132", "#ff5500", "#ff96f1", "#dc0000"]
 algorithms = ["tt_svd", "tt_rsvd"]
 
 n = None
@@ -62,7 +62,7 @@ for alg_id, alg in enumerate(algorithms):
 
 
 
-labels = ["tt_sdd", "tt_rsvd"]
+labels = ["tt_svd", "tt_rsvd"]
 file_name = "A_hilbert_time_n"
 
 plt.plot(n, time_taken[0], "-", label=labels[0], ms=3)
@@ -86,7 +86,7 @@ plt.close('all')
 
 
 
-labels = ["tt_sdd", "tt_rsvd"]
+labels = ["tt_svd", "tt_rsvd"]
 file_name = "A_hilbert_error_n"
 
 plt.plot(n, errors05[0], "-o", label=labels[0], ms=3)

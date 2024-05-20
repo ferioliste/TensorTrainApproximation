@@ -124,3 +124,15 @@ function tt_sum(TT1, TT2)
 
     return TT
 end
+
+function tt_mult(k, oldTT)
+    n_dims = length(TT)
+    k_root = k^(1/n_dims)
+
+    TT = Array{AbstractArray{Float64},1}(undef, n_dims)
+    for μ in 1:n_dims
+        TT[μ] = k_root*deepcopy(oldTT[μ])
+    end
+
+    return TT
+end

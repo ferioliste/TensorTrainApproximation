@@ -62,7 +62,7 @@ for alg_id, alg in enumerate(algorithms):
 
 
 
-labels = ["tt_sdd", "tt_rsvd"]
+labels = ["tt_svd", "tt_rsvd"]
 file_name = "A_sqrt_sum_time_d"
 
 plt.plot(d, time_taken[0], "-", label=labels[0], ms=3)
@@ -86,7 +86,7 @@ plt.close('all')
 
 
 
-labels = ["tt_sdd", "tt_rsvd"]
+labels = ["tt_svd", "tt_rsvd"]
 file_name = "A_sqrt_sum_error_d"
 
 plt.plot(d, errors05[0], "-o", label=labels[0], ms=3)

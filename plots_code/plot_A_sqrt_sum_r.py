@@ -7,15 +7,15 @@ import pandas as pd
 import numpy as np
 
 data_path_prefix = "../test_results/"
-data_file_name = "A_hilbert_r.csv"
+data_file_name = "A_sqrt_sum_r.csv"
 cols = ["rank", "algorithm", "t1", "t2", "t3", "time_taken", "error"]
 
 df = pd.read_csv(data_path_prefix + data_file_name, usecols=cols).dropna()
 
-file_names = ["A_hilbert_tt_svd_ratio_r", "A_hilbert_tt_rsvd_ratio_r"]
+file_names = ["A_sqrt_sum_tt_svd_ratio_r", "A_sqrt_sum_tt_rsvd_ratio_r"]
 labels = [["svd", "matrix multiplication", None, "other"], ["sketching", "QR factorization", "matrix multiplication", "other"]]
 
-colors = ["#fad132", "#ff5500", "#ff3cc8", "#dc0000"]
+colors = ["#fad132", "#ff5500", "#ff96f1", "#dc0000"]
 algorithms = ["tt_svd", "tt_rsvd"]
 
 rank = None
@@ -49,7 +49,7 @@ for alg_id, alg in enumerate(algorithms):
     
     ax.set_ylabel('Runtime ripartition')
     ax.set_xlabel('$TT-rank$')
-    ax.set_title('Factorization of square-root-sum tensor ($d=7$, $n=5$) with ' + alg)
+    ax.set_title('Factorization of square-root-sum tensor ($d=5$, $n=5$) with ' + alg)
     ax.set_xticks([0, 4, 8, 12, 16])
     ax.set_xticklabels([1, 5, 9, 13, 17])
     ax.legend()
@@ -62,8 +62,8 @@ for alg_id, alg in enumerate(algorithms):
 
 
 
-labels = ["tt_sdd", "tt_rsvd"]
-file_name = "A_hilbert_time_r"
+labels = ["tt_svd", "tt_rsvd"]
+file_name = "A_sqrt_sum_time_r"
 
 plt.plot(rank, time_taken[0], "-", label=labels[0], ms=3)
 plt.plot(rank, time_taken[1], "-", label=labels[1], ms=3)
@@ -72,7 +72,7 @@ plt.xticks(rank)
 plt.ylabel("Runtime")
 plt.xlabel("TT-rank")
 plt.legend()
-plt.title("Factorization of square-root-sum tensor ($d=7$, $n=5$)")
+plt.title("Factorization of square-root-sum tensor ($d=5$, $n=5$)")
 
 save_path = "../plots/"
 plt.savefig(save_path + file_name + ".pdf", transparent=True, bbox_inches="tight")
@@ -84,8 +84,8 @@ plt.close('all')
 
 
 
-labels = ["tt_sdd", "tt_rsvd"]
-file_name = "A_hilbert_error_r"
+labels = ["tt_svd", "tt_rsvd"]
+file_name = "A_sqrt_sum_error_r"
 
 plt.plot(rank, errors05[0], "-o", label=labels[0], ms=3)
 
@@ -103,7 +103,7 @@ plt.ylabel("Relative error")
 plt.xlabel("TT-rank")
 plt.yscale("log")
 plt.legend()
-plt.title("Factorization of square-root-sum tensor ($d=7$, $n=5$)")
+plt.title("Factorization of square-root-sum tensor ($d=5$, $n=5$)")
 
 save_path = "../plots/"
 plt.savefig(save_path + file_name + ".pdf", transparent=True, bbox_inches="tight")

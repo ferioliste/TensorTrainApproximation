@@ -41,8 +41,9 @@ function run_test(file_path::String, row_index::Int; save::Bool = true, T = noth
     end
 end
 
-mid = "sqrt_sum"
-ending = "d"
+
+mid = "hilbert"
+ending = "n"
 
 file_path = "../test_results/A_" * mid * "_" * ending * ".csv"
 

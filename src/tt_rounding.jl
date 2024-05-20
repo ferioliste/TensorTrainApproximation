@@ -34,7 +34,7 @@ function tt_rsvd_rounding(oldTT, tt_ranks; sketch_type = "gaussian", s = 1, seed
     
     TT = Array{AbstractArray{Float64},1}(undef, n_dims)
     tt_ranks = [1; fix_ranks(tt_ranks, dims); 1]
-
+    
     @timeit to "t1" begin
         TT[n_dims] = deepcopy(oldTT[n_dims])
         for μ = n_dims:-1:2
@@ -44,11 +44,14 @@ function tt_rsvd_rounding(oldTT, tt_ranks; sketch_type = "gaussian", s = 1, seed
         end
     end
 
+    rng = isnothing(seed) ? Random.default_rng() : MersenneTwister(seed)
+    seeds = rand(rng, UInt32, n_dims-1)
+
     @timeit to "t2" begin
         for μ = 1:1:n_dims-1
             temp = reshape(TT[μ], (tt_ranks[μ]*dims[μ], old_tt_ranks[μ+1]))
             
-            F = qr(sketch(temp', tt_ranks[μ+1], sketch_type, s=s, seed=seed)')
+            F = qr(sketch(temp', tt_ranks[μ+1], sketch_type, s=s, seed=seeds[μ])')
             TT[μ] = reshape(Matrix(F.Q), (tt_ranks[μ], dims[μ], tt_ranks[μ+1]))
             TT[μ+1] = (Matrix(F.Q)' * temp) * reshape(TT[μ+1], (old_tt_ranks[μ+1], dims[μ+1]*old_tt_ranks[μ+2]))
         end
@@ -66,11 +69,14 @@ function tt_rand_orth_rounding(oldTT, tt_ranks;  sketch_type = "gaussian", s = 1
     TT = Array{AbstractArray{Float64},1}(undef, n_dims)
     tt_ranks = [1; fix_ranks(tt_ranks, dims); 1]
 
+    rng = isnothing(seed) ? Random.default_rng() : MersenneTwister(seed)
+    seeds = rand(rng, UInt32, n_dims-1)
+
     @timeit to "t1" begin
         W = Array{Array{Float64, 2},1}(undef, n_dims - 1)
-        W[n_dims - 1] = sketch(reshape(oldTT[n_dims], (old_tt_ranks[n_dims], dims[n_dims]*old_tt_ranks[n_dims+1]))', tt_ranks[n_dims], sketch_type, s=s, seed=seed)'
+        W[n_dims - 1] = sketch(reshape(oldTT[n_dims], (old_tt_ranks[n_dims], dims[n_dims]*old_tt_ranks[n_dims+1]))', tt_ranks[n_dims], sketch_type, s=s, seed=seeds[n_dims-1])'
         for μ = n_dims-1:-1:2
-            W[μ - 1] = sketch(reshape(reshape(oldTT[μ], (old_tt_ranks[μ]*dims[μ], old_tt_ranks[μ+1]))*W[μ], (old_tt_ranks[μ], dims[μ]*tt_ranks[μ+1]))', tt_ranks[μ], sketch_type, s=s, seed=seed)'
+            W[μ - 1] = sketch(reshape(reshape(oldTT[μ], (old_tt_ranks[μ]*dims[μ], old_tt_ranks[μ+1]))*W[μ], (old_tt_ranks[μ], dims[μ]*tt_ranks[μ+1]))', tt_ranks[μ], sketch_type, s=s, seed=seeds[μ-1])'
         end
     end
 
@@ -129,15 +135,17 @@ function tt_sketch_STTA_rounding(C, left_ranks, right_ranks; sketch_type = "gaus
     return Psi, Omega
 end
 
-function tt_STTA_rounding(TT, left_ranks, right_ranks; sketch_type = "gaussian", s = 1, seed = nothing)
+function tt_STTA_rounding(TT, left_ranks, right_ranks; sketch_type = "gaussian", s = 1, seed = nothing, to::TimerOutput=TimerOutput())
     if !(all(left_ranks .< right_ranks) || all(right_ranks .< left_ranks))
         error("The ranks provided are not valid")
     end
 
-    Psi, Omega = tt_sketch_STTA_rounding(TT, left_ranks, right_ranks, sketch_type=sketch_type, s=s, seed=seed)
-    if left_ranks[1] < right_ranks[1]
-        return assemble_sketch_kres_left(Psi, Omega)
-    else
-        return assemble_sketch_kres_right(Psi, Omega)
+    @timeit to "t1" Psi, Omega = tt_sketch_STTA_rounding(TT, left_ranks, right_ranks, sketch_type=sketch_type, s=s, seed=seed)
+    @timeit to "t2" begin
+        if left_ranks[1] < right_ranks[1]
+            return assemble_sketch_kres_left(Psi, Omega)
+        else
+            return assemble_sketch_kres_right(Psi, Omega)
+        end
     end
 end

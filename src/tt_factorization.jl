@@ -24,14 +24,17 @@ function tt_rsvd(tensor, tt_ranks; sketch_type = "gaussian", s = 1, seed = nothi
 
     TTTensor = Array{AbstractArray{Float64},1}(undef, n_dims)
 
+    rng = isnothing(seed) ? Random.default_rng() : MersenneTwister(seed)
+    seeds = rand(rng, UInt32, n_dims-1)
+
     C = deepcopy(tensor)
-    for i in 1:n_dims-1
-        C = reshape(C, (tt_ranks[i]*dims[i], :))
+    for μ in 1:n_dims-1
+        C = reshape(C, (tt_ranks[μ]*dims[μ], :))
         @timeit to "t1" begin
-            temp = Matrix(sketch(C', tt_ranks[i+1], sketch_type, s=s, seed=seed)')
+            temp = Matrix(sketch(C', tt_ranks[μ+1], sketch_type, s=s, seed=seeds[μ])')
             @timeit to "t2" F = qr(temp)
         end
-        TTTensor[i] = reshape(Matrix(F.Q), (tt_ranks[i], dims[i], tt_ranks[i+1]))
+        TTTensor[μ] = reshape(Matrix(F.Q), (tt_ranks[μ], dims[μ], tt_ranks[μ+1]))
         @timeit to "t3" C = Matrix(F.Q)' * C
     end
     TTTensor[n_dims] = reshape(C, (size(C)..., 1))

@@ -33,59 +33,20 @@ function run_test(file_path::String, row_index::Int; save::Bool = true)
     end
 end
 
-try
-    ending = "d"
 
-    file_path = "../test_results/B_tt_hilbert_" * ending * ".csv"
 
-    for i in 1:10
-        run_test(file_path, 1, save = false)
-        run_test(file_path, 2, save = false)
-        run_test(file_path, 3, save = false)
-    end
+ending = "d"
 
-    for i in 4:100000
-        run_test(file_path, i, save = true)
-    end
+file_path = "../test_results/B_tt_hilbert_" * ending * ".csv"
 
-    run_python_script("../plots_code/plot_B_tt_hilbert_" * ending * ".py")
-catch e
+for i in 1:10
+    run_test(file_path, 1, save = false)
+    run_test(file_path, 2, save = false)
+    run_test(file_path, 3, save = false)
 end
 
-try
-    ending = "n"
-
-    file_path = "../test_results/B_tt_hilbert_" * ending * ".csv"
-
-    for i in 1:10
-        run_test(file_path, 1, save = false)
-        run_test(file_path, 2, save = false)
-        run_test(file_path, 3, save = false)
-    end
-
-    for i in 4:100000
-        run_test(file_path, i, save = true)
-    end
-
-    run_python_script("../plots_code/plot_B_tt_hilbert_" * ending * ".py")
-catch e
+for i in 4:100000
+    run_test(file_path, i, save = true)
 end
 
-try
-    ending = "r"
-
-    file_path = "../test_results/B_tt_hilbert_" * ending * ".csv"
-
-    for i in 1:10
-        run_test(file_path, 1, save = false)
-        run_test(file_path, 2, save = false)
-        run_test(file_path, 3, save = false)
-    end
-
-    for i in 4:100000
-        run_test(file_path, i, save = true)
-    end
-
-    run_python_script("../plots_code/plot_B_tt_hilbert_" * ending * ".py")
-catch e
-end
+run_python_script("../plots_code/plot_B_tt_hilbert_" * ending * ".py")

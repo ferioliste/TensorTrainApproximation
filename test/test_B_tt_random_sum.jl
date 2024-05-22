@@ -48,5 +48,3 @@ end
 for i in 4:100000
     run_test(file_path, i, save = true)
 end
-
-run_python_script("../plots_code/plot_B_tt_random_sum_" * ending * ".py")

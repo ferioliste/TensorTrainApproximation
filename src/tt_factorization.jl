@@ -68,7 +68,7 @@ function tt_sketch_STTA(tensor, left_ranks, right_ranks; sketch_type = "gaussian
     return Psi, Omega
 end
 
-function assemble_sketch_kres_right(Psi, Omega; tol = 1e-12)
+function assemble_sketch_kres_right(Psi, Omega; tol = eps(Float64))
     n_dims = length(Psi)
 
     TTTensor = Array{AbstractArray{Float64},1}(undef, n_dims)
@@ -88,7 +88,7 @@ function assemble_sketch_kres_right(Psi, Omega; tol = 1e-12)
     return TTTensor
 end
 
-function assemble_sketch_kres_left(Psi, Omega; tol = 1e-12)
+function assemble_sketch_kres_left(Psi, Omega; tol = eps(Float64))
     n_dims = length(Psi)
 
     TTTensor = Array{AbstractArray{Float64},1}(undef, n_dims)

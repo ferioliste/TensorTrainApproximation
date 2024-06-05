@@ -48,7 +48,7 @@ for alg_id, alg in enumerate(algorithms):
     
     ax.set_ylabel('Runtime ripartition')
     ax.set_xlabel('Number of dimensions ($d$)')
-    ax.set_title('Rounding of random-sum tensor train ($n=5$, $r=10$, $\\varepsilon=10^{-8}$) with ' + alg)
+    ax.set_title('Rounding of random-sum tensor train ($n=5$, $r=20$, $\\varepsilon=10^{-8}$) with ' + alg)
     ax.set_xticks([0, 3, 6, 8])
     ax.set_xticklabels([3, 6, 9, 11])
     ax.legend()
@@ -72,7 +72,7 @@ plt.xticks(d)
 plt.ylabel("Runtime")
 plt.xlabel("Number of dimensions ($d$)")
 plt.legend()
-plt.title("Rounding of random-sum tensor train ($n=5$, $r=10$, $\\varepsilon=10^{-8}$)")
+plt.title("Rounding of random-sum tensor train ($n=5$, $r=20$, $\\varepsilon=10^{-8}$)")
 
 save_path = "../plots/"
 plt.savefig(save_path + file_name + ".pdf", transparent=True, bbox_inches="tight")
@@ -113,7 +113,7 @@ plt.ylabel("Relative error")
 plt.xlabel("Number of dimensions ($d$)")
 plt.yscale("log")
 plt.legend()
-plt.title("Rounding of random-sum tensor train ($n=5$, $r=10$, $\\varepsilon=10^{-8}$)")
+plt.title("Rounding of random-sum tensor train ($n=5$, $r=20$, $\\varepsilon=10^{-8}$)")
 
 save_path = "../plots/"
 plt.savefig(save_path + file_name + ".pdf", transparent=True, bbox_inches="tight")

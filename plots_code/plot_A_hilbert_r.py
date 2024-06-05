@@ -52,7 +52,7 @@ for alg_id, alg in enumerate(algorithms):
     ax.set_title('Factorization of Hilbert tensor ($d=5$, $n=5$) with ' + alg)
     ax.set_xticks([0, 4, 8, 12, 16])
     ax.set_xticklabels([1, 5, 9, 13, 17])
-    ax.legend()
+    ax.legend(loc='lower left')
 
     save_path = "../plots/"
     plt.savefig(save_path + file_names[alg_id] + ".pdf", transparent=True, bbox_inches="tight")

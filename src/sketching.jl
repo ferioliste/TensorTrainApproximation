@@ -41,24 +41,3 @@ function sketch_srht_hash(A, k, s, seed = nothing)
 
     return sqrt(s)*hcat([mapreduce(p -> A_transformed[p.second,:]*rand(rng, [-1, 1]), +, filter(p -> p.first==i, pairs), init=zeros(Float64,size(A)[2])) for i in 1:k]...)'
 end
-
-function sketch_srht_hash_byrows(A, k, s, seed = nothing)
-    rng = isnothing(seed) ? Random.default_rng() : MersenneTwister(seed)
-    
-    rows, cols = size(A)
-    rows_pow2 = 2^ceil(Int, log2(rows))
-
-    A_transformed = (rows_pow2/sqrt(k)) * fwht_natural(vcat(sample(rng, [-1, 1], rows) .* A, zeros(Float64, rows_pow2 - rows, cols)),1)
-    A_sketched = zeros(k, cols)
-
-    for i in 1:k
-        if rows_pow2 < s
-            hashed_idxs = sample(rng, 1:rows_pow2, s, replace=true)
-        else
-            hashed_idxs = sample(rng, 1:rows_pow2, s, replace=false)
-        end
-        
-        A_sketched[i,:] = sum(sample(rng, [-1, 1], s) .* A_transformed[hashed_idxs,:], dims=1)/sqrt(s)
-    end
-    return A_sketched
-end

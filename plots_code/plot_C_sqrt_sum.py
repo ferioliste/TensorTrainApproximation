@@ -22,7 +22,7 @@ STTA_srht_hash_df = df[df["algorithm"] == "STTA_srht_hash"]
 
 plot_ranks = df["rank"].unique()
 
-labels = ["TT-SVD", "TT-RSVD", "STTA-gaussian", "STTA-srht", "STTA-srht-hashed"]
+labels = ["TT-SVD", "TT-RSVD", "STTA-Gaussian", "STTA-SRHT", "STTA-HRHT"]
 
 plt.plot(plot_ranks, tt_svd_df.groupby("rank").error.mean(), "-o", label=labels[0], ms=3)
 

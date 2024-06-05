@@ -22,7 +22,7 @@ STTA_srht_hash_df = df[df["algorithm"] == "STTA_srht_hash"]
 
 plot_ranks = df["rank"].unique()
 
-labels = ["TT-SVD", "TT-RSVD", "STTA-gaussian", "STTA-srht", "STTA-srht-hashed"]
+labels = ["TT-SVD", "TT-RSVD", "STTA-Gaussian", "STTA-SRHT", "STTA-HRHT"]
 
 plt.plot(plot_ranks, tt_svd_df.groupby("rank").error.mean(), "-o", label=labels[0], ms=3)
 
@@ -50,7 +50,7 @@ plt.xticks(plot_ranks)
 plt.ylabel("Relative error")
 plt.xlabel("TT-rank")
 plt.yscale("log")
-plt.legend()
+plt.legend(loc = "lower left")
 plt.title("Approximation of Hilbert tensor")
 plt.savefig(save_path_prefix + save_file_name, transparent=True, bbox_inches="tight")
 plt.show()

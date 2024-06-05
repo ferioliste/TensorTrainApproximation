@@ -127,11 +127,11 @@ end
 
 function tt_mult(k, oldTT)
     n_dims = length(TT)
-    k_root = k^(1/n_dims)
+    k_root = abs(k)^(1/n_dims)
 
     TT = Array{AbstractArray{Float64},1}(undef, n_dims)
     for μ in 1:n_dims
-        TT[μ] = k_root*deepcopy(oldTT[μ])
+        TT[μ] = (μ == 1 ? sign(k) : 1)*k_root*deepcopy(oldTT[μ])
     end
 
     return TT

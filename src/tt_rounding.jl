@@ -50,7 +50,6 @@ function tt_rsvd_rounding(oldTT, tt_ranks; sketch_type = "gaussian", s = 1, seed
     @timeit to "t2" begin
         for μ = 1:1:n_dims-1
             temp = reshape(TT[μ], (tt_ranks[μ]*dims[μ], old_tt_ranks[μ+1]))
-            
             F = qr(sketch(temp', tt_ranks[μ+1], sketch_type, s=s, seed=seeds[μ])')
             TT[μ] = reshape(Matrix(F.Q), (tt_ranks[μ], dims[μ], tt_ranks[μ+1]))
             TT[μ+1] = (Matrix(F.Q)' * temp) * reshape(TT[μ+1], (old_tt_ranks[μ+1], dims[μ+1]*old_tt_ranks[μ+2]))

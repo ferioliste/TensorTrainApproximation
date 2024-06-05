@@ -67,7 +67,8 @@ file_name = "A_hilbert_time_d"
 
 plt.plot(d, time_taken[0], "-", label=labels[0], ms=3)
 plt.plot(d, time_taken[1], "-", label=labels[1], ms=3)
-plt.plot(d, np.exp(d)/5000, "--", label="$c e^d$", ms=1)
+plt.plot(d, (np.exp((3/2)*d[0])/50000)*np.exp(d)/np.exp(d[0]), "--", label="$c_1 e^d$", ms=1)
+plt.plot(d, np.exp((3/2)*np.array(d))/50000, "--", label="$c_2 e^{1.5\\,d}$", ms=1)
 
 plt.xticks(d)
 plt.ylabel("Runtime")

@@ -3,8 +3,6 @@ function sketch(A, k, sketch_type = "gaussian"; s = 1, seed = nothing)
         return sketch_gaussian(A, k, seed)
     elseif sketch_type == "srht"
         return sketch_srht(A, k, seed)
-    elseif sketch_type == "srht_hash_byrows"
-        return sketch_srht_hash_byrows(A, k, s, seed)
     elseif sketch_type == "srht_hash"
         return sketch_srht_hash(A, k, s, seed)
     else
